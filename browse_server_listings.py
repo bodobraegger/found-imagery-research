@@ -28,18 +28,19 @@ def download_directory(url, output_dir='.', recursive=False):
     try:
         response = requests.get(url, headers=HEADERS)
         response.raise_for_status()
-        
+
         parser = DirectoryParser()
         parser.feed(response.text)
-        
+
         os.makedirs(output_dir, exist_ok=True)
-        
+
         for link in parser.links:
             if link in ['/', '../', '..', '.'] or link.startswith('?'):
                 continue
-                
             full_url = urljoin(url, link)
-            
+            # url-decode the link for easier reading
+            link = requests.utils.unquote(link)
+
             if link.endswith('/') and recursive:
                 new_dir = os.path.join(output_dir, link.rstrip('/'))
                 print(f"Entering directory: {link}")
@@ -49,7 +50,7 @@ def download_directory(url, output_dir='.', recursive=False):
                 try:
                     file_response = requests.get(full_url, headers=HEADERS)
                     file_response.raise_for_status()
-                    
+
                     file_path = os.path.join(output_dir, link)
                     # if the file already exists, skip it
                     if os.path.exists(file_path):
@@ -60,7 +61,7 @@ def download_directory(url, output_dir='.', recursive=False):
                     print(f"Successfully downloaded: {link}")
                 except Exception as e:
                     print(f"Error downloading {link}: {e}")
-                    
+
     except Exception as e:
         print(f"Error accessing {url}: {e}")
 
@@ -68,7 +69,7 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python script.py URL [-r] [-o OUTPUT_DIR]")
         sys.exit(1)
-        
+
     url = sys.argv[1]
     recursive = '-r' in sys.argv
     
