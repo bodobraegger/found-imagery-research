@@ -51,6 +51,10 @@ def download_directory(url, output_dir='.', recursive=False):
                     file_response.raise_for_status()
                     
                     file_path = os.path.join(output_dir, link)
+                    # if the file already exists, skip it
+                    if os.path.exists(file_path):
+                        print(f"File already exists: {link}")
+                        continue
                     with open(file_path, 'wb') as f:
                         f.write(file_response.content)
                     print(f"Successfully downloaded: {link}")
