@@ -5,6 +5,7 @@ import os
 import sys
 
 class DirectoryParser(HTMLParser):
+    """Extends HTMLParser to extract links from HTML content."""
     def __init__(self):
         super().__init__()
         self.links = []
